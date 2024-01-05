@@ -44,3 +44,4 @@ func (c *couponRepository)FindCouponDiscount(coupon string)int{
 	fmt.Println("Discount:",discountRate)
 	return discountRate
 }
+//
