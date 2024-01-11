@@ -168,3 +168,122 @@ func(i *userDatabase)EditUsername(id int,username string)error{
 	}
 	return nil
 }
+
+func (i *userDatabase)EditPhone(id int,phone string)error{
+	err:=i.DB.Exec(`update users set phone=? where id=?`,phone,id).Error
+	if err!=nil{
+		return err
+	}
+	return nil
+}
+
+func (ad *userDatabase)RemoveFromCart(cartID int,inventoryID int)error{
+
+	if err:=ad.DB.Exec(`delete from line_items where cart_id=? and inventory_id=?`,cartID,inventoryID).Error;err!=nil{
+		return err
+	}
+	return nil
+}
+
+func (ad *userDatabase)ClearCart(cartID int)error{
+
+	if err:=ad.DB.Exec(`delete from line_itemds where cart_id=?`,cartID).Error;err!=nil{
+		return err
+	}
+
+	return nil
+}
+
+func (ad *userDatabase)UpdateQuantityAdd(id,inv_id int)error{
+	query:=`UPDATE line_items
+	SET quantity=quantity+1
+	WHERE cart_id=? AND inventory_id=?
+	`
+
+	result:=ad.DB.Exec(query,id,inv_id)
+	if result.Error!=nil{
+		return result.Error
+	}
+	return nil
+}
+
+func (ad *userDatabase)UpdateQuantityLess(id,inv_id int)error{
+	query:=`
+	UPDATE line_items
+	SET quantity=quantity-1
+	WHERE cart_id=? AND inventory_id=?
+	`
+
+	result:=ad.DB.Exec(query,id,inv_id)
+	if result.Error!=nil{
+		return result.Error
+	}
+	return nil
+}
+
+func (cr *userDatabase)FindUserByOrderID(orderID string)(domain.User,error){
+
+	var userDetails domain.User
+	err:=cr.DB.Raw("select users.name,users.email,users.phone from users inner join orders on orders.user_id=users.id where order_id=?",orderID).Scan(&userDetails).Error
+	if err!=nil{
+		return domain.User{},err
+	}
+	return userDetails,nil
+}
+
+func (ad *userDatabase)GetCartID(id int)(int,error){
+	var cart_id int
+
+	if err:=ad.DB.Raw("select id from carts where user_id=?",id).Scan(&cart_id).Error;err!=nil{
+		return 0,err
+	}
+	return cart_id,nil
+}
+
+func (ad *userDatabase)GetProductsInCart(cart_id,page,limit int)([]int,error){
+
+	if page==0{
+		page=1
+	}
+	if limit==0{
+		limit=10
+	}
+	offset:=(page-1)*limit
+	var cart_products []int
+
+	if err:=ad.DB.Raw("select inventory_id from line_items where cart_id=? limit ? offset ?",cart_id,limit,offset).Scan(&cart_products).Error;err!=nil{
+		return cart_products,nil
+	}
+	return cart_products,nil
+}
+
+func (ad *userDatabase)FindProductNames(inventory_id int)(string,error){
+
+	var product_name string
+
+	if err:=ad.DB.Raw("select product_name from inventories where id=?",inventory_id).Scan(&product_name).Error;err!=nil{
+		return "",err
+	}
+
+	return product_name,nil
+}
+
+func(ad *userDatabase)FindCartQuantity(cart_id,inventory_id int)(int,error){
+
+	var quantity int
+
+	if err:=ad.DB.Raw("select quantity from line_items where cart_id=? and inventory_id=?",cart_id,inventory_id).Scan(&quantity).Error;err!=nil{
+		return 0,err
+	}
+	return quantity,nil
+}
+
+func (ad *userDatabase)FindPrice(inventory_id int)(float64,error){
+
+	var price float64
+
+	if err:=ad.DB.Raw("select price from inventories where id=?",inventory_id).Scan(&price).Error;err!=nil{
+		return 0,err
+	}
+	return price,nil
+}
