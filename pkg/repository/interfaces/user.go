@@ -11,7 +11,7 @@ type UserRepository interface {
 	FindUserByEmail(user models.UserLogin) (models.UserResponse, error)
 	SignUp(user models.UserDetails) (models.UserResponse, error)
 	Addaddress(id int, address models.AddAddress, result bool) error
-	GetAddresses(id int) (domain.Address, error)
+	GetAddresses(id int) ([]domain.Address, error)
 	CheckIfFirstAddress(id int) bool
 	GetUserDetails(id int) (models.UserResponse, error)
 	FindUserIDByOrderID(orderID int) (int, error)

@@ -77,5 +77,5 @@ func (c *couponRepository) ValidateCoupon(coupon string) (bool, error) {
 	if !valid {
 		return false, errors.New("not a valid coupon")
 	}
-	return true,nil
+	return true, nil
 }

@@ -159,20 +159,20 @@ func (i *inventoryRepository) CheckPrice(pid int) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return k,nil
+	return k, nil
 }
 
-func (ad *inventoryRepository)SearchProducts(key string,page,limit int)([]models.InventoryList,error){
-	if page ==0{
-		page =1
+func (ad *inventoryRepository) SearchProducts(key string, page, limit int) ([]models.InventoryList, error) {
+	if page == 0 {
+		page = 1
 	}
-	if limit==0{
-		limit=10
+	if limit == 0 {
+		limit = 10
 	}
-	offset:=(page-1)*limit
+	offset := (page - 1) * limit
 	var productDetails []models.InventoryList
 
-	query:=`
+	query := `
 	SELECT
 	      inventories.id,
 		  inventories,product_name,
@@ -192,60 +192,60 @@ func (ad *inventoryRepository)SearchProducts(key string,page,limit int)([]models
 	OR description ILIKE '%'||?||'%'
 	LIMIT ? OFFSET ?
 	`
-	if err:=ad.DB.Raw(query,key,limit,offset).Scan(&productDetails).Error;err!=nil{
-		return []models.InventoryList{},err
+	if err := ad.DB.Raw(query, key, limit, offset).Scan(&productDetails).Error; err != nil {
+		return []models.InventoryList{}, err
 	}
-	return productDetails,nil
+	return productDetails, nil
 }
 
-func (ad *inventoryRepository)GetCategoryProducts(catID int,page,limit int)([]models.InventoryList,error){
-	if page ==0{
-		page=1
+func (ad *inventoryRepository) GetCategoryProducts(catID int, page, limit int) ([]models.InventoryList, error) {
+	if page == 0 {
+		page = 1
 	}
-	if limit==0{
-		limit=10
+	if limit == 0 {
+		limit = 10
 	}
-	offset:=(page-1)*limit
+	offset := (page - 1) * limit
 	var productDetails []models.InventoryList
 
-	query :=`
+	query := `
 	SELECT inventories.id,inventories.product_name,inventories.description,inventories.stock,inventories.price,inventories.image,categories.category AS category FROM inventories JOIN categories ON inventories.category_id=categories.id
 	      WHERE inventories.category_id=?
 		  limit ? offset ?
 	`
 
-	if err:=ad.DB.Raw(query,catID,limit,offset).Scan(&productDetails).Error;err!=nil{
-		return []models.InventoryList{},err
+	if err := ad.DB.Raw(query, catID, limit, offset).Scan(&productDetails).Error; err != nil {
+		return []models.InventoryList{}, err
 	}
 
-	return productDetails,nil
+	return productDetails, nil
 }
 
-func (ad *inventoryRepository)AddImage(product_id int,imageURL string)(models.InventoryResponse,error){
+func (ad *inventoryRepository) AddImage(product_id int, imageURL string) (models.InventoryResponse, error) {
 	var inventoryResponse models.InventoryResponse
-	query :=`
+	query := `
 	INSERT INTO images (inventory_id,image_url)
 	VALUES (?,?) RETURNING inventory_id
 	`
 
-	ad.DB.Raw(query,product_id,imageURL).Scan(&inventoryResponse.ProductID)
+	ad.DB.Raw(query, product_id, imageURL).Scan(&inventoryResponse.ProductID)
 
-	return inventoryResponse,nil
+	return inventoryResponse, nil
 }
 
-func (ad *inventoryRepository)DeleteImage(product_id,imageID int)error{
-	result:=ad.DB.Exec("DELETE FROM images WHERE id=?",imageID)
+func (ad *inventoryRepository) DeleteImage(product_id, imageID int) error {
+	result := ad.DB.Exec("DELETE FROM images WHERE id=?", imageID)
 
-	if result.RowsAffected<1{
+	if result.RowsAffected < 1 {
 		return errors.New("no records with that ID exist")
 	}
 	return nil
 }
 
-func (ad *inventoryRepository)GetImagesFromInventoryID(product_id int)([]models.ImageInfo,error){
+func (ad *inventoryRepository) GetImagesFromInventoryID(product_id int) ([]models.ImageInfo, error) {
 	var images []models.ImageInfo
-	if err:=ad.DB.Raw("select id,image_url from images where inventory_id=?",product_id).Scan(&images).Error;err!=nil{
-		return []models.ImageInfo{},err
+	if err := ad.DB.Raw("select id,image_url from images where inventory_id=?", product_id).Scan(&images).Error; err != nil {
+		return []models.ImageInfo{}, err
 	}
-	return images,nil
+	return images, nil
 }

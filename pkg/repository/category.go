@@ -94,5 +94,5 @@ func (c *categoryRepository) GetCategories(page, limit int) ([]domain.Category, 
 	if err := c.DB.Raw("select id,category from categories limit?offset?", limit, offset).Scan(&categories).Error; err != nil {
 		return []domain.Category{}, err
 	}
-	return categories,nil
+	return categories, nil
 }
