@@ -74,7 +74,7 @@ func (w *WishlistRepository)FindCategory(inventory_id int)(string,error){
 	}
 
 	return category,nil
-}////
+}//
 func (w *WishlistRepository)RemoveFromWishlist(wishlistID int,inventoryID int)error{
 	if err:=w.DB.Exec(`delete from wishlist_items where wishlist_id=? and inventory_id=?`,wishlistID,inventoryID).Error;err!=nil{
 		return err
