@@ -81,3 +81,28 @@ func (w *WishlistRepository)RemoveFromWishlist(wishlistID int,inventoryID int)er
 	}
 	return nil
 }
+
+func (w *WishlistRepository)AddWishlistItems(wishlistID,inventory_id int)error{
+
+	err:=w.DB.Exec(`
+	INSERT INTO wishlist_items (wishlist_id,inventory_id)
+	VALUES (?,?)`,wishlistID,inventory_id).Error
+	if err!=nil{
+		return err
+	}
+	return nil
+}
+
+func (w *WishlistRepository)CreateNewWishlist(user_id int)(int,error){
+	var id int
+	err:=w.DB.Exec(`
+	insert into wishlists (user_id)
+	values (?)`,user_id).Error
+	if err!=nil{
+		return 0,err
+	}
+	if err:=w.DB.Raw("select id from wishlists where user_id=?",user_id).Scan(&id).Error;err!=nil{
+		return 0,err
+	}
+	return id,nil
+}
