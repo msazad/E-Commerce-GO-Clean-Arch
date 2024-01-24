@@ -33,5 +33,4 @@ func ConnectDB(cfg config.Config)(*gorm.DB,error){
 	db.AutoMigrate(&domain.Image{})
 
 	return db, dbErr
-}
-////
+}//////////
