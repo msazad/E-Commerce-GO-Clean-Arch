@@ -34,4 +34,4 @@ func ConnectDB(cfg config.Config)(*gorm.DB,error){
 
 	return db, dbErr
 }
-//
+////
