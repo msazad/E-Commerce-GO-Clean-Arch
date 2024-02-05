@@ -12,4 +12,5 @@ type InventoryUsecase interface {
 	UpdateImage(invID int,image *multipart.FileHeader)(models.Inventory,error)
 	DeleteInventory(id string)error
 	ShowIndividualProducts(id string)(models.InventoryDetails,error)
+	//
 }
