@@ -1,8 +1,11 @@
 package domain
 
+import "gorm.io/gorm"
+
 type Coupon struct {
-	ID           int    `json:"-" gorm:"primarykey"`
-	Name         string `json:"name" gorm:"unique;not null"`
-	DiscountRate int    `json:"discount_rate"`
-	Valid        bool   `gorm:"default:True"`
+	gorm.Model
+	Coupon       string `json:"coupon" gorm:"unique"`
+	DiscountRate int    `json:"discount_rate" `
+	Valid        bool   `json:"valid" gorm:"default:true"`
 }
+
