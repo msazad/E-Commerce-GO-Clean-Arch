@@ -15,3 +15,4 @@ type Wallet struct {
 // 	Purpose  string    `json:"purpose"`
 // 	Time     time.Time `json:"time"`
 // }
+
