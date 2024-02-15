@@ -14,4 +14,3 @@ type AdminToken struct {
 	Token        string
 	RefreshToken string
 }
-
