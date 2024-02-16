@@ -26,3 +26,4 @@ type Order struct {
 	PaymentMethodID int `json:"payment_id"`
 	CouponID        int `json:"coupon_id"`
 }
+
