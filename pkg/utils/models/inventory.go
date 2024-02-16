@@ -37,3 +37,7 @@ type ImageInfo struct {
 	ID       int    `json:"id"`
 	ImageURL string `json:"imageURl"`
 }
+type AddToCart struct {
+	UserID      int `json:"user_id"`
+	InventoryID int `json:"inventory_id"`
+}
