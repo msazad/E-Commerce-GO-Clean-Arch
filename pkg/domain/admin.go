@@ -1,16 +1,17 @@
 package domain
 
-import "github.com/msazad/go-Ecommerce/pkg/utils/models"
+import (
+	"github.com/msazad/go-Ecommerce/pkg/utils/models"
+)
 
-// Admin represents an administrative user in the system
 type Admin struct {
-	ID       uint   `json:"id" gorm:"unique;not null"`
-	Username string `json:"name" gorm:"validate:required"`
-	Email    string `json:"email" gorm:"validate:required"`
+	ID       int    `json:"id" gorm:"unique;not null"`
+	Name     string `json:"name" gorm:"validate:required"`
+	UserName string `json:"email" gorm:"validate:required"`
 	Password string `json:"password" gorm:"validate:required"`
 }
 type AdminToken struct {
-	Admin        models.AdminDetailsResposnse
+	Admin        models.AdminDetailsResponse
 	Token        string
 	RefreshToken string
 }
