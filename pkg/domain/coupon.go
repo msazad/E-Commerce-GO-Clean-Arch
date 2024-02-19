@@ -9,3 +9,5 @@ type Coupon struct {
 	Valid        bool   `json:"valid" gorm:"default:true"`
 }
 
+
+
