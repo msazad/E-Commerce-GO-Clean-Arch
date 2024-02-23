@@ -1,19 +1,17 @@
 package domain
 
-// User represents a user in the system.
 type User struct {
-	ID         int    `gorm:"primaryKey"`
+	ID         int    `json:"id" gorm:"primarykey"`
 	Name       string `json:"name"`
-	Email      string `gorm:"unique" json:"email"`
+	Email      string `json:"email" gorm:"unique"`
 	Username   string `json:"username"`
 	Password   string `json:"password"`
-	Phone      string `gorm:"unique" json:"phone"`
-	Permission bool   `gorm:"default:true" json:"permission"`
+	Phone      string `json:"phone" gorm:"unique"`
+	Permission bool   `json:"permission" gorm:"default:true"`
 }
 
-// Address represents the address of a user
 type Address struct {
-	ID        uint   `json:"id" gorm:"unique;not null"`
+	Id        uint   `json:"id" gorm:"unique;not null"`
 	UserID    uint   `json:"user_id"`
 	User      User   `json:"-" gorm:"foreignkey:UserID"`
 	Name      string `json:"name" validate:"required"`
@@ -22,5 +20,5 @@ type Address struct {
 	City      string `json:"city" validate:"required"`
 	State     string `json:"state" validate:"required"`
 	Pin       string `json:"pin" validate:"required"`
-	Default bool `json:"default" gorm:"default:false"`
+	Default   bool   `json:"default" gorm:"default:false"`
 }
