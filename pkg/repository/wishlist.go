@@ -1,108 +1,115 @@
 package repository
 
 import (
+	"errors"
+
 	"github.com/msazad/go-Ecommerce/pkg/repository/interfaces"
 	"github.com/msazad/go-Ecommerce/pkg/utils/models"
 	"gorm.io/gorm"
 )
 
-type WishlistRepository struct{
+type wishlistReposotory struct {
 	DB *gorm.DB
 }
 
-func NewWishlistRepository(DB *gorm.DB)interfaces.WishlistRepository{
-	return &WishlistRepository{DB}
-}
+// constructor function
 
-func (w *WishlistRepository)GetWishlistID(id int)(int,error){
-
-	var wishlistID int
-
-	if err:=w.DB.Raw("select id from wishlist where user_id=?",id).Scan(&wishlistID).Error;err!=nil{
-		return 0,err
+func NewWishlistRepository(DB *gorm.DB) interfaces.WishlistRepository {
+	return &wishlistReposotory{
+		DB: DB,
 	}
-
-	return wishlistID,nil
 }
 
-func (w *WishlistRepository)GetWishlist(id int)([]models.GetWishlist,error){
-
-	var wishlist []models.GetWishlist
-
-	if err:=w.DB.Raw("select wishlist.user_id,categories.category,inventories.product_name,inventories.price from wishlists join wishlist_items on iwshlist_items.inventory_id=inventories.id join categories on inventories.category_id=categories.id where wishlists.user_id=?",id).Scan(&wishlist).Error;err!=nil{
-		return []models.GetWishlist{},err
+func (wlr *wishlistReposotory) GetWishlistId(user_id int) (int, error) {
+	var wishlistId int
+	if err := wlr.DB.Raw("SELECT id FROM wishlist WHERE user_id=?", user_id).Scan(&wishlistId).Error; err != nil {
+		return 0, errors.New("wishlist id not found")
 	}
-	return wishlist,nil
+	return wishlistId, nil
 }
 
-func (w *WishlistRepository)GetProductsInWishlist(wishlistID int)([]int,error){
+func (wlr *wishlistReposotory) GetWishlist(id int) ([]models.GetWishlist, error) {
+	var getWishlist []models.GetWishlist
 
-	var WishlistProducts []int
-	if err:=w.DB.Raw("select inventory_id from wishlist_items where wishlist_id=?",wishlistID).Scan(&WishlistProducts).Error;err!=nil{
-		return []int{},err
+	query := `
+	SELECT wishlist.user_id,categories.category,inventories.product_name,inventories.price
+	FROM wishlist
+	JOIN wishlist_items.wishlist_id=wishlist.idgetWishlist
+	JOIN invenotries ON wishlist_items.inventory_id=inventories.id
+	JOIN categories ON inventories.category_id=categories.id 
+	WHERE wishlist.user_id
+
+	`
+	if err := wlr.DB.Raw(query, id).Scan(&getWishlist).Error; err != nil {
+		return []models.GetWishlist{}, err
 	}
-	return WishlistProducts,nil
+	return getWishlist, nil
 }
 
-func (w *WishlistRepository)FindProductNames(inventory_id int)(string,error){
+func (wlr *wishlistReposotory) GetProductsInWishlist(wishlistId int) ([]int, error) {
+	var productsInWishlist []int
 
-	var product_name string
-
-	if err:=w.DB.Raw("select product_name from inventories where id=?",inventory_id).Scan(&product_name).Error;err!=nil{
-		return "",err
+	if err := wlr.DB.Raw("SELECT inventory_id FROM wishlist_items WHERE wishlist_id", wishlistId).Scan(&productsInWishlist).Error; err != nil {
+		return []int{}, err
 	}
-
-	return product_name,nil
+	return productsInWishlist, nil
 }
 
-func (w *WishlistRepository)FindPrice(inventory_id int)(float64,error){
+func (wlr *wishlistReposotory) FindProductNames(inventory_id int) (string, error) {
+	var productName string
 
+	if err := wlr.DB.Raw("SELECT product_name FROM inventories WHERE inventory_id=?", inventory_id).Scan(&productName).Error; err != nil {
+		return "", errors.New("product name not found")
+	}
+	return productName, nil
+}
+
+func (wlr *wishlistReposotory) FindPrice(inventory_id int) (float64, error) {
 	var price float64
-
-	if err:=w.DB.Raw("select price from inventories where id=?",inventory_id).Scan(&price).Error;err!=nil{
-		return 0,err
+	if err := wlr.DB.Raw("SELECT price FROM inventories WHERE inventory_id=?", inventory_id).Scan(&price).Error; err != nil {
+		return 0, errors.New("price not found")
 	}
-	return price,nil
+	return price, nil
 }
 
-func (w *WishlistRepository)FindCategory(inventory_id int)(string,error){
-
+func (wlr *wishlistReposotory) FindCategory(inventory_id int) (string, error) {
 	var category string
 
-	if err:=w.DB.Raw("select categories.category from inventories join categories on inventories.category_id=categories.id where inventories.id=?",inventory_id).Scan(&category).Error;err!=nil{
-		return "",err
-	}
+	query := `
+	
+	SELECT categories.category FROM invenotries
+	JOIN categories ON inventories.category_id=category.id
+	WHERE inventory_id=?
 
-	return category,nil
+	`
+	if err := wlr.DB.Raw(query, inventory_id).Scan(&category).Error; err != nil {
+		return "", errors.New("category not found")
+	}
+	return category, nil
 }
-func (w *WishlistRepository)RemoveFromWishlist(wishlistID int,inventoryID int)error{
-	if err:=w.DB.Exec(`delete from wishlist_items where wishlist_id=? and inventory_id=?`,wishlistID,inventoryID).Error;err!=nil{
+
+func (wlr *wishlistReposotory) RemoveFromWishlist(wishlistId, inventoryId int) error {
+	if err := wlr.DB.Exec("DELETE FROM wishlist_item WHERE wishlist_id=? AND inventory_id=?", wishlistId, inventoryId).Error; err != nil {
+		return errors.New("remove from wishlist failed")
+	}
+	return nil
+}
+
+func (wlr *wishlistReposotory) AddWishlistItem(wishlistId, inventoryId int) error {
+	if err := wlr.DB.Exec("INSERT INTO wishlist_item(wishlist_id,inventory_id)VALUES(?,?)", wishlistId, inventoryId).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (w *WishlistRepository)AddWishlistItems(wishlistID,inventory_id int)error{
+func (wlr *wishlistReposotory) CreateNewWishlist(user_id int) (int, error) {
+	var wishlistId int
 
-	err:=w.DB.Exec(`
-	INSERT INTO wishlist_items (wishlist_id,inventory_id)
-	VALUES (?,?)`,wishlistID,inventory_id).Error
-	if err!=nil{
-		return err
+	if err := wlr.DB.Exec("INSERT INTO wishlist(user_id)VALUES(?)", user_id).Error; err != nil {
+		return 0, errors.New("wishlist creation failed")
 	}
-	return nil
-}
-
-func (w *WishlistRepository)CreateNewWishlist(user_id int)(int,error){
-	var id int
-	err:=w.DB.Exec(`
-	insert into wishlists (user_id)
-	values (?)`,user_id).Error
-	if err!=nil{
-		return 0,err
+	if err := wlr.DB.Raw("SELECT id FROM wishlist WHERE user_id", user_id).Scan(&wishlistId).Error; err != nil {
+		return 0, errors.New("wishlist id not found")
 	}
-	if err:=w.DB.Raw("select id from wishlists where user_id=?",user_id).Scan(&id).Error;err!=nil{
-		return 0,err
-	}
-	return id,nil
+	return wishlistId, nil
 }

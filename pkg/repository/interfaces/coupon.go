@@ -1,11 +1,14 @@
 package interfaces
 
-import "github.com/msazad/go-Ecommerce/pkg/domain"
+import (
+	"github.com/msazad/go-Ecommerce/pkg/domain"
+	"github.com/msazad/go-Ecommerce/pkg/utils/models"
+)
 
 type CouponRepository interface {
-	AddCoupon(domain.Coupon) error
+	AddCoupon(models.Coupon) error
 	MakeCouponInvalid(id int) error
-	FindCouponDiscount(coupon string) int
-	GetCoupons(page, limit int) ([]domain.Coupon, error)
+	FindCouponDetails(couponId int) (domain.Coupon, error)
+	GetCoupons() ([]domain.Coupon, error)
 	ValidateCoupon(coupon string) (bool, error)
 }

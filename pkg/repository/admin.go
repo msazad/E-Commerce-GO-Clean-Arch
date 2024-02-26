@@ -19,38 +19,41 @@ func NewAdminRepository(DB *gorm.DB) interfaces.AdminRepository {
 		DB: DB,
 	}
 }
-func (ad *adminRepository) LoginHandler(adminDetails models.AdminLogin) (domain.Admin, error) {
 
-	var adminCompareDetails domain.Admin
-	if err := ad.DB.Raw("select * from admins where email=? ", adminDetails.Email).Scan(&adminCompareDetails).Error; err != nil {
+func (ar *adminRepository) LoginHandler(adminDetails models.AdminLogin) (domain.Admin, error) {
+	var adminCompareDetail domain.Admin
+	err := ar.DB.Raw("select * from admins where user_name = ?", adminDetails.Email).Scan(&adminCompareDetail).Error
+	if err != nil {
 		return domain.Admin{}, err
 	}
-	return adminCompareDetails, nil
+	fmt.Println("admincompare details from repo", adminCompareDetail)
+	return adminCompareDetail, nil
 }
-func (ad *adminRepository) GetUserByID(id string) (domain.User, error) {
-	user_id, err := strconv.Atoi(id)
+
+func (ar *adminRepository) GetUserById(id string) (domain.User, error) {
+	userId, err := strconv.Atoi(id)
 	if err != nil {
 		return domain.User{}, err
 	}
-	query := fmt.Sprintf("select * from users where id ='%d'", user_id)
+	query := fmt.Sprintf("select * from users where id = '%d'", userId)
 	var userDetails domain.User
-	if err := ad.DB.Raw(query).Scan(&userDetails).Error; err != nil {
+	err = ar.DB.Raw(query).Scan(&userDetails).Error
+	if err != nil {
 		return domain.User{}, err
 	}
 	return userDetails, nil
 }
 
-// function which will both block and unblock a user
-func (ad *adminRepository) UpdateBlockUserByID(user domain.User) error {
-	err := ad.DB.Exec("update users set permission =? where id=?", user.Permission, user.ID).Error
+// This function will both block and unblock user
+func (ar *adminRepository) UpdateBlockUserById(user domain.User) error {
+	err := ar.DB.Exec("update users set permission = ? where id = ?", user.Permission, user.ID).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ad *adminRepository) GetUsers(page int, limit int) ([]models.UserDetailsAtAdmin, error) {
-	//pagination purpose -
+func (ar *adminRepository) GetUsers(page, limit int) ([]models.UserDetailsAtAdmin, error) {
 	if page == 0 {
 		page = 1
 	}
@@ -59,8 +62,8 @@ func (ad *adminRepository) GetUsers(page int, limit int) ([]models.UserDetailsAt
 	}
 	offset := (page - 1) * limit
 	var userDetails []models.UserDetailsAtAdmin
-
-	if err := ad.DB.Raw("select id,name,email,phone,permission from users limit? offset?", limit, offset).Scan(&userDetails).Error; err != nil {
+	err := ar.DB.Raw("select id,name,email,phone,permission from users limit ? offset ?", limit, offset).Scan(&userDetails).Error
+	if err != nil {
 		return []models.UserDetailsAtAdmin{}, err
 	}
 	return userDetails, nil

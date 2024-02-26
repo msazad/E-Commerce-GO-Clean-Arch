@@ -11,36 +11,41 @@ type offerRepository struct {
 	DB *gorm.DB
 }
 
+// constructor function
+
 func NewOfferRepository(DB *gorm.DB) interfaces.OfferRepository {
 	return &offerRepository{
 		DB: DB,
 	}
 }
 
-func (o *offerRepository) AddNewOffer(offer models.CreateOffer) error {
-	if err := o.DB.Exec("INSERT INTO offers(category_id,discount_rate) values($1,$2)", offer.CategoryID, offer, offer.Discount).Error; err != nil {
+func (or *offerRepository) AddNewOffer(offer models.CreateOffer) error {
+	err := or.DB.Exec("INSERT INTO offers(category_id,discount_rate) VALUES (?,?)", offer.CategoryID, offer.Discount).Error
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *offerRepository) MakeOfferExpire(catID int) error {
-	if err := o.DB.Exec("UPDATE offers SET valid=false where id=$1", catID).Error; err != nil {
+func (or *offerRepository) MakeOfferExpired(categoryId int) error {
+	err := or.DB.Exec("UPDATE offers SET valid=false WHERE id=$1", categoryId).Error
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *offerRepository) FindDiscountPercentage(catID int) (int, error) {
+func (or *offerRepository) FindDiscountPercentage(categoryId int) (int, error) {
 	var percentage int
-	err := o.DB.Raw("select discount_rate from offers where category_id=$1 and valid=true", catID).Scan(&percentage).Error
+
+	err := or.DB.Raw("SELECT discount_rate FROM offers WHERE category_id=$1 and valid=true", categoryId).Scan(&percentage).Error
 	if err != nil {
 		return 0, err
 	}
 	return percentage, nil
 }
 
-func (o *offerRepository) GetOffers(page, limit int) ([]domain.Offer, error) {
+func (or *offerRepository) GetOffers(page, limit int) ([]domain.Offer, error) {
 	if page == 0 {
 		page = 1
 	}
@@ -48,11 +53,11 @@ func (o *offerRepository) GetOffers(page, limit int) ([]domain.Offer, error) {
 		limit = 10
 	}
 	offset := (page - 1) * limit
-	var offers []domain.Offer
 
-	if err := o.DB.Raw("select id,category_id,discount_rate,valid from offers limit ? offset ?", limit, offset).Scan(&offers).Error; err != nil {
+	var getOffers []domain.Offer
+
+	if err := or.DB.Raw("SELECT id,category_id,discount_rate,valid FROM offers limit ? offset ?", limit, offset).Scan(&getOffers).Error; err != nil {
 		return []domain.Offer{}, err
 	}
-
-	return offers, nil
+	return getOffers, nil
 }

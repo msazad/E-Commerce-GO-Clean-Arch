@@ -2,80 +2,71 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/msazad/go-Ecommerce/pkg/domain"
-	"github.com/msazad/go-Ecommerce/pkg/repository/interfaces"
+	"github.com/msazad/go-Ecommerce/pkg/utils/models"
 	"gorm.io/gorm"
 )
 
 type couponRepository struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
-func NewCouponRepository(DB *gorm.DB) interfaces.CouponRepository {
+// constructor function
+func NewCouponRepository(DB *gorm.DB) *couponRepository {
 	return &couponRepository{
-		db: DB,
+		DB: DB,
 	}
 }
 
-func (c *couponRepository) AddCoupon(coup domain.Coupon) error {
-	if err := c.db.Exec("INSERT INTO coupons(name,discount_rate,valid) values($1,$2,$3)", coup.Name, coup.DiscountRate, coup.Valid).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *couponRepository) MakeCouponInvalid(id int) error {
-	if err := c.db.Exec("UPDATE coupons SET valid=false where id=$1", id).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-func (c *couponRepository) FindCouponDiscount(coupon string) int {
-	var discountRate int
-	err := c.db.Raw("select discount_rate from coupons where name=?", coupon).Scan(&discountRate).Error
+func (couprep *couponRepository) AddCoupon(coupon models.Coupon) error {
+	err := couprep.DB.Exec("INSERT INTO coupons(coupon,discount_rate,valid)VALUES ($1,$2,$3)", coupon.Coupon, coupon.DiscountRate, coupon.Valid).Error
 	if err != nil {
-		return 0
+		return err
 	}
-	// if !coupon.Valid {
-	// return 1
-	// }
-	fmt.Println("Discount:", discountRate)
-	return discountRate
+	return nil
 }
 
-func (c *couponRepository) GetCoupons(page, limit int) ([]domain.Coupon, error) {
-	if page == 0 {
-		page = 1
+func (couprep *couponRepository) MakeCouponInvalid(id int) error {
+	err := couprep.DB.Exec("UPDATE coupons SET valid=false WHERE id=$1", id).Error
+	if err != nil {
+		return err
 	}
-	if limit == 0 {
-		limit = 10
-	}
-	offset := (page - 1) * limit
-	var coupons []domain.Coupon
+	return nil
+}
 
-	if err := c.db.Raw("select id,name,discount_rate,valid from coupons limit ? offset ?", limit, offset).Scan(&coupons).Error; err != nil {
+func (couprep *couponRepository) FindCouponDetails(couponId int) (domain.Coupon, error) {
+	var coupon domain.Coupon
+
+	err := couprep.DB.Raw("SELECT * FROM coupon WHERE id =? ", couponId).Scan(&coupon).Error
+	if err != nil {
+		return domain.Coupon{}, err
+	}
+	return coupon, nil
+}
+
+func (couprep *couponRepository) GetCoupons() ([]domain.Coupon, error) {
+	var coupon []domain.Coupon
+	err := couprep.DB.Raw("SELECT * FROM coupons").Scan(&coupon).Error
+	if err != nil {
 		return []domain.Coupon{}, err
 	}
-	return coupons, nil
+	return coupon, nil
 }
 
-func (c *couponRepository) ValidateCoupon(coupon string) (bool, error) {
+func (couprep *couponRepository) ValidateCoupon(coupon string) (bool, error) {
 	count := 0
-	if err := c.db.Raw("select count(id) from coupons where name=?", coupon).Scan(&count).Error; err != nil {
+	err := couprep.DB.Raw("SELECT COUNT(id)FROM coupons WHERE name=?", coupon).Scan(&count).Error
+	if err != nil {
 		return false, err
 	}
 	if count < 1 {
 		return false, errors.New("not a valid coupon")
 	}
 	valid := true
-	if err := c.db.Raw("select valid from coupons where name=?", coupon).Scan(&valid).Error; err != nil {
+	err = couprep.DB.Raw("SELECT valid FROM coupons WHERE name = ?", coupon).Scan(&valid).Error
+	if err != nil {
 		return false, err
-	}
-	if !valid {
-		return false, errors.New("not a valid coupon")
 	}
 	return true, nil
 }

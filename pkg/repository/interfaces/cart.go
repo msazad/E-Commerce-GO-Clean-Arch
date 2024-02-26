@@ -1,13 +1,15 @@
 package interfaces
 
-import "github.com/msazad/go-Ecommerce/pkg/domain"
+import (
+	// "github.com/Anandhu4456/go-Ecommerce/pkg/domain"
+	"github.com/msazad/go-Ecommerce/pkg/utils/models"
+)
 
 type CartRepository interface {
-	//GetCart(id int)([]models.GetCart,error)
-	GetAddresses(id int) ([]domain.Address, error)
-	CheckIfInvAdded(invID, cartID int) bool
+	GetAddresses(id int) ([]models.Address, error)
+	CheckIfInvAdded(invId, cartId int) bool
 	GetCartId(user_id int) (int, error)
 	CreateNewCart(user_id int) (int, error)
-	AddLineItems(invID, cartID int) error
-	AddQuantity(invID, cartID int) error
+	AddLineItems(invId, cartId int) error
+	AddQuantity(invId, cartId int) error
 }
