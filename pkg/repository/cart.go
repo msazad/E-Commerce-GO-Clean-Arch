@@ -1,8 +1,8 @@
 package repository
 
 import (
-	// "github.com/Anandhu4456/go-Ecommerce/pkg/domain"
-	// "github.com/Anandhu4456/go-Ecommerce/pkg/repository/interfaces"
+	// "github.com/msazad/go-Ecommerce/pkg/domain"
+	// "github.com/msazad/go-Ecommerce/pkg/repository/interfaces"
 
 	"github.com/msazad/go-Ecommerce/pkg/utils/models"
 	"gorm.io/gorm"

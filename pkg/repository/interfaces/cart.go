@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	// "github.com/Anandhu4456/go-Ecommerce/pkg/domain"
+	// "github.com/msazad/go-Ecommerce/pkg/domain"
 	"github.com/msazad/go-Ecommerce/pkg/utils/models"
 )
 
