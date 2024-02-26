@@ -1,11 +1,13 @@
 package interfaces
 
-import "github.com/msazad/go-Ecommerce/pkg/utils/models"
+import (
+	"github.com/msazad/go-Ecommerce/pkg/domain"
+	"github.com/msazad/go-Ecommerce/pkg/utils/models"
+)
 
-
-type AdminUsecase interface{
-	LoginHandler(admindetails models.AdminLogin)(models.TokenAdmin,error)
-	BlockUser(id string)error
-	UnblockUser(id string)error
-	GetUsers(page,limit int)([]models.UserDetailsAtAdmin,error)
+type AdminUsecase interface {
+	LoginHandler(adminDetails models.AdminLogin) (domain.AdminToken, error)
+	BlockUser(id string) error
+	UnblockUser(id string) error
+	GetUsers(page, limit int) ([]models.UserDetailsAtAdmin, error)
 }
