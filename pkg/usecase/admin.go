@@ -97,3 +97,11 @@ func (au *adminUsecase)UnblockUser(id string)error{
 	}
 	return nil
 }
+
+func (au *adminUsecase)GetUsers(page,limit int)([]models.UserDetailsAtAdmin,error){
+	users,err:=au.adminRepository.GetUsers(page,limit)
+	if err!=nil{
+		return []models.UserDetailsAtAdmin{},errors.New("getting users failed")
+	}
+	return users,nil
+}
