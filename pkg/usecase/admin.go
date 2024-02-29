@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	"github.com/msazad/go-Ecommerce/pkg/domain"
-	"github.com/msazad/go-Ecommerce/pkg/repository/interfaces"
+	interfaces "github.com/msazad/go-Ecommerce/pkg/repository/interfaces"
 	services "github.com/msazad/go-Ecommerce/pkg/usecase/interfaces"
 	"github.com/msazad/go-Ecommerce/pkg/utils/models"
-	"golang.org/x/crypto/acme/autocert"
 	"golang.org/x/crypto/bcrypt"
+	// "golang.org/x/crypto/bcrypt"
 )
 
 type adminUsecase struct {
@@ -24,18 +24,18 @@ func NewAdminUsecase(adRepo interfaces.AdminRepository) services.AdminUsecase {
 
 }
 
-func (au *adminUsecase)LoginHandler(adminDetails models.AdminLogin)(domain.AdminToken,error){
+func (au *adminUsecase) LoginHandler(adminDetails models.AdminLogin) (domain.AdminToken, error) {
 	//Getting details of the admin based on the email provided
 
-	adminCompareDetails,_:=au.adminRepository.LoginHandler(adminDetails)
+	adminCompareDetails, _ := au.adminRepository.LoginHandler(adminDetails)
 
-	if adminCompareDetails.UserName!=adminDetails.Email{
-		return domain.AdminToken{},errors.New("admin not exist")
+	if adminCompareDetails.UserName != adminDetails.Email {
+		return domain.AdminToken{}, errors.New("admin not exist")
 	}
 	//Compare password from database that provided by admin
-	err:=bcrypt.CompareHashAndPassword([]byte(adminCompareDetails.Password),[]byte(adminDetails.Password))
-	if err!=nil{
-		return domain.AdminToken{},err
+	err := bcrypt.CompareHashAndPassword([]byte(adminCompareDetails.Password), []byte(adminDetails.Password))
+	if err != nil {
+		return domain.AdminToken{}, err
 	}
 	var adminDetailsResponse models.AdminDetailsResponse
 
@@ -44,64 +44,64 @@ func (au *adminUsecase)LoginHandler(adminDetails models.AdminLogin)(domain.Admin
 	// 	return domain.AdminToken{}, err
 	// }
 
-	adminDetailsResponse.ID=adminCompareDetails.ID
-	adminDetailsResponse.Name=adminCompareDetails.Name
-	adminDetailsResponse.Email=adminCompareDetails.UserName
+	adminDetailsResponse.ID = adminCompareDetails.ID
+	adminDetailsResponse.Name = adminCompareDetails.Name
+	adminDetailsResponse.Email = adminCompareDetails.UserName
 
-	fmt.Println("admindetails response id",adminDetailsResponse.ID)
-	fmt.Println("admindetails response name",adminDetailsResponse.Name)
-	fmt.Println("admin details response email",adminDetailsResponse.Email)
+	fmt.Println("admindetails response id", adminDetailsResponse.ID)
+	fmt.Println("admindetails response name", adminDetailsResponse.Name)
+	fmt.Println("admin details response email", adminDetailsResponse.Email)
 
 	fmt.Println("reached here--------")
 
-	token,refresh,err:=helper.GenerateAdminToken(adminDetailsResponse)
-	if err!=nil{
-		return domain.AdminToken{},err
+	token, refresh, err := helper.GenerateAdminToken(adminDetailsResponse)
+	if err != nil {
+		return domain.AdminToken{}, err
 	}
 	return domain.AdminToken{
-		Admin: adminDetailsResponse,
-		Token: token,
+		Admin:        adminDetailsResponse,
+		Token:        token,
 		RefreshToken: refresh,
-	},nil
+	}, nil
 }
 
-func (au *adminUsecase)BlockUser(id string)error{
-	user,err:=au.adminRepository.GetUserById(id)
-	if err!=nil{
+func (au *adminUsecase) BlockUser(id string) error {
+	user, err := au.adminRepository.GetUserById(id)
+	if err != nil {
 		return errors.New("user not found")
 	}
-	if !user.Permission{
+	if !user.Permission {
 		return errors.New("already blocked")
-	}else{
-		user.Permission=false
+	} else {
+		user.Permission = false
 	}
-	err=au.adminRepository.UpdateBlockUserById(user)
-	if err!=nil{
+	err = au.adminRepository.UpdateBlockUserById(user)
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (au *adminUsecase)UnblockUser(id string)error{
-	user,err:=au.adminRepository.GetUserById(id)
-	if err!=nil{
+func (au *adminUsecase) UnblockUser(id string) error {
+	user, err := au.adminRepository.GetUserById(id)
+	if err != nil {
 		return errors.New("user not found")
 	}
-	if !user.Permission{
+	if !user.Permission {
 		//means that user is blocked(false)..then,
-		user.Permission=true
+		user.Permission = true
 	}
-	err=au.adminRepository.UpdateBlockUserById(user)
-	if err!=nil{
+	err = au.adminRepository.UpdateBlockUserById(user)
+	if err != nil {
 		return errors.New("error in unblock user")
 	}
 	return nil
 }
 
-func (au *adminUsecase)GetUsers(page,limit int)([]models.UserDetailsAtAdmin,error){
-	users,err:=au.adminRepository.GetUsers(page,limit)
-	if err!=nil{
-		return []models.UserDetailsAtAdmin{},errors.New("getting users failed")
+func (au *adminUsecase) GetUsers(page, limit int) ([]models.UserDetailsAtAdmin, error) {
+	users, err := au.adminRepository.GetUsers(page, limit)
+	if err != nil {
+		return []models.UserDetailsAtAdmin{}, errors.New("getting users failed")
 	}
-	return users,nil
+	return users, nil
 }
