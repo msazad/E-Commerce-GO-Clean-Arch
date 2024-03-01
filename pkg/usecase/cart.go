@@ -3,9 +3,10 @@ package usecase
 import (
 	"errors"
 
-	interfaces "github.com/msazad/go-Ecommerce/pkg/repository/interfaces"
-	services "github.com/msazad/go-Ecommerce/pkg/usecase/interfaces"
-	"github.com/msazad/go-Ecommerce/pkg/utils/models"
+	// "github.com/Anandhu4456/go-Ecommerce/pkg/domain"
+	interfaces "github.com/Anandhu4456/go-Ecommerce/pkg/repository/interfaces"
+	services "github.com/Anandhu4456/go-Ecommerce/pkg/usecase/interfaces"
+	"github.com/Anandhu4456/go-Ecommerce/pkg/utils/models"
 )
 
 type CartUsecase struct {
