@@ -4,8 +4,9 @@ import (
 	"errors"
 
 	"github.com/msazad/go-Ecommerce/pkg/domain"
-	"github.com/msazad/go-Ecommerce/pkg/repository/interfaces"
+	interfaces"github.com/msazad/go-Ecommerce/pkg/repository/interfaces"
 	"github.com/msazad/go-Ecommerce/pkg/utils/models"
+	services "github.com/msazad/go-Ecommerce/pkg/usecase/interfaces"
 )
 
 
@@ -16,7 +17,7 @@ type offerUsecase struct{
 //constructor function
 
 
-func NewOfferUsecase(offerRepo interfaces.OfferRepository)services.offerUsecase{
+func NewOfferUsecase(offerRepo interfaces.OfferRepository)services.OfferUsecase{
 	return &offerUsecase{
 		offerRepo: offerRepo,
 	}
