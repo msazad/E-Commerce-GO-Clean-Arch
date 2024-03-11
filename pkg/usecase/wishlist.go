@@ -111,3 +111,4 @@ func (wlU *wishlistUsecase) AddToWishlist(user_id, inventory_id int) error {
 	return nil
 }
 
+
