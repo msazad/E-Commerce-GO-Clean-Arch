@@ -46,3 +46,46 @@ func (ah *AdminHandler)LoginHandler(c *gin.Context){
 	successRes:=response.ClientResponse(http.StatusOK,"Admin authenticated successfully",admin,nil)
 	c.JSON(http.StatusOK,successRes)
 }
+
+// @Summary		Block User
+// @Description	using this handler admins can block an user
+// @Tags			Admin
+// @Accept			json
+// @Produce		json
+// @Security		Bearer
+// @Param			id	query		string	true	"user-id"
+// @Success		200	{object}	response.Response{}
+// @Failure		500	{object}	response.Response{}
+// @Router			/admin/users/block [post]
+func (ah *AdminHandler)BlockUser(c *gin.context){
+	id:=c.Query("id")
+	err:=ah.adminUsecase.BlockUser(id)
+	if err!=nil{
+		errRes:=response.ClientResponse(http.StatusBadRequest,"cant block",nil,err.Error())
+		c.JSON(http.StatusBadRequest,errRes)
+		return
+	}
+	successRes:=response.ClientResponse(http.StatusOK,"blocked the user",nil,nil)
+	c.JSON(http.StatusOK,successRes)
+}
+// @Summary		UnBlock an existing user
+// @Description	UnBlock user
+// @Tags			Admin
+// @Accept			json
+// @Produce		json
+// @Security		Bearer
+// @Param			id	query		string	true	"user-id"
+// @Success		200	{object}	response.Response{}
+// @Failure		500	{object}	response.Response{}
+// @Router			/admin/users/unblock [POST]
+func (ah *AdminHandler)UnblockUser(c *gin.Context){
+	id:=c.Query("id")
+	err:=ah.adminUsecase.UnblockUser(id)
+	if err!=nil{
+		errRes:=response.ClientResponse(http.StatusBadRequest,"can't unblock user",nil,err.Error())
+		c.JSON(http.StatusBadRequest,errRes)
+		return
+	}
+	successRes:=response.ClientResponse(http.StatusOK,"unblocked user",nil,nil)
+	c.JSON(http.StatusOK,successRes)
+}
