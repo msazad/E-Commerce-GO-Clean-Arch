@@ -133,3 +133,4 @@ func (ah *AdminHandler)GetUsers(c *gin.Context){
 	successRes:=response.ClientResponse(http.StatusOK,"successfully retrieved the users",users,nil)
 	c.JSON(http.StatusOK,successRes)
 }
+
