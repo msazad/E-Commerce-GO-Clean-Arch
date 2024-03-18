@@ -3,10 +3,12 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/msazad/go-Ecommerce/pkg/utils/models"
 	"github.com/msazad/go-Ecommerce/pkg/utils/response"
+	services "github.com/msazad/go-Ecommerce/pkg/usecase/interfaces"
 )
 
 type AdminHandler struct {
@@ -15,7 +17,7 @@ type AdminHandler struct {
 
 //constructor function
 
-func NewAdminHandler(adminUsecase services.adminUsecase) *adminHandler {
+func NewAdminHandler(adminUsecase services.AdminUsecase) *AdminHandler {
 	return &AdminHandler{
 		adminUsecase: adminUsecase,
 	}
@@ -38,12 +40,19 @@ func (ah *AdminHandler)LoginHandler(c *gin.Context){
 		c.JSON(http.StatusBadRequest,errRes)
 		return
 	}
+	admin,err:=ah.adminUsecase.LoginHandler(adminDetails)
+	if err!=nil{
+		errRes:=response.ClientResponse(http.StatusBadRequest,"can't authenticate admin",nil,err.Error())
+		c.JSON(http.StatusBadRequest,errRes)
+		return
+	}
 	//c.Set("",admin.Token)
 	//c.Set("Refresh",admin.RefreshToken)
-	c.SetCookie("Authorization",admin.Token,3600 *24*30,"/",false,true)
+	c.SetCookie("Authorization",admin.Token,3600 *24*30,"/","",false,true)
 	c.SetCookie("Refresh",admin.RefreshToken,3600 *24*30,"/","",false,true)
 
 	successRes:=response.ClientResponse(http.StatusOK,"Admin authenticated successfully",admin,nil)
+	fmt.Println("fron admin Hander",admin)
 	c.JSON(http.StatusOK,successRes)
 }
 
@@ -57,7 +66,7 @@ func (ah *AdminHandler)LoginHandler(c *gin.Context){
 // @Success		200	{object}	response.Response{}
 // @Failure		500	{object}	response.Response{}
 // @Router			/admin/users/block [post]
-func (ah *AdminHandler)BlockUser(c *gin.context){
+func (ah *AdminHandler)BlockUser(c *gin.Context){
 	id:=c.Query("id")
 	err:=ah.adminUsecase.BlockUser(id)
 	if err!=nil{
@@ -87,5 +96,40 @@ func (ah *AdminHandler)UnblockUser(c *gin.Context){
 		return
 	}
 	successRes:=response.ClientResponse(http.StatusOK,"unblocked user",nil,nil)
+	c.JSON(http.StatusOK,successRes)
+}
+// @Summary		Get Users
+// @Description	Retrieve users with pagination
+// @Tags			Admin
+// @Accept			json
+// @Produce		json
+// @Security		Bearer
+// @Param			limit	query		string	true	"limit"
+// @Param			page	query		string	true	"Page number"
+// @Success		200		{object}	response.Response{}
+// @Failure		500		{object}	response.Response{}
+// @Router			/admin/users/getusers [get]
+func (ah *AdminHandler)GetUsers(c *gin.Context){
+	pageStr:=c.Query("page")
+	page,err:=strconv.Atoi(pageStr)
+	if err!=nil{
+		errorRes:=response.ClientResponse(http.StatusBadRequest,"page number is not in right format",nil,err.Error())
+		c.JSON(http.StatusBadRequest,errorRes)
+		return
+	}
+	limitStr:=c.Query("limit")
+	limit,err:=strconv.Atoi(limitStr)
+	if err!=nil{
+		errorRes:=response.ClientResponse(http.StatusBadRequest,"page number not in right format",nil,err.Error())
+		c.JSON(http.StatusBadRequest,errorRes)
+		return
+	}
+	users,err:=ah.adminUsecase.GetUsers(page,limit)
+	if err!=nil{
+		errorRes:=response.ClientResponse(http.StatusBadRequest,"could not retrieve records",nil,err.Error())
+		c.JSON(http.StatusBadRequest,errorRes)
+		return
+	}
+	successRes:=response.ClientResponse(http.StatusOK,"successfully retrieved the users",users,nil)
 	c.JSON(http.StatusOK,successRes)
 }
