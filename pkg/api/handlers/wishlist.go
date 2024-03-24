@@ -119,3 +119,4 @@ func (wiH *WishlistHandler) GetWishlist(c *gin.Context) {
 	successRes := response.ClientResponse(http.StatusOK, "successfully retrieved products from wishlist", products, nil)
 	c.JSON(http.StatusOK, successRes)
 }
+
