@@ -120,3 +120,4 @@ func (wiH *WishlistHandler) GetWishlist(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 }
 
+
