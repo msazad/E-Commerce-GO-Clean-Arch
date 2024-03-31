@@ -1,9 +1,9 @@
 package api
 
 import (
-	_ "github.com/Anandhu4456/go-Ecommerce/cmd/api/docs"
-	handlers "github.com/Anandhu4456/go-Ecommerce/pkg/api/handlers"
-	"github.com/Anandhu4456/go-Ecommerce/pkg/routes"
+	_ "github.com/msazad/go-Ecommerce/cmd/api/docs"
+	handlers "github.com/msazad/go-Ecommerce/pkg/api/handlers"
+	"github.com/msazad/go-Ecommerce/pkg/routes"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -42,4 +42,3 @@ func NewServerHttp(categoryHandler *handlers.CategoryHandler,
 func (sh *ServerHTTP) Start() {
 	sh.engine.Run(":8082")
 }
-
