@@ -5,10 +5,10 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
 	services "github.com/msazad/go-Ecommerce/pkg/usecase/interfaces"
 	"github.com/msazad/go-Ecommerce/pkg/utils/models"
 	"github.com/msazad/go-Ecommerce/pkg/utils/response"
-	"github.com/gin-gonic/gin"
 )
 
 type OrderHandler struct {
@@ -351,11 +351,11 @@ func (orH *OrderHandler) ReturnOrder(c *gin.Context) {
 // @Router /users/check-out/order/download-invoice  [get]
 func (orH *OrderHandler) DownloadInvoice(c *gin.Context) {
 	// Set the appropriate header for the file download
-	c.Header("Content-Disposition", "attachment; filename=yoursstore_invoice.pdf")
+	c.Header("Content-Disposition", "attachment; filename=primemart_invoice.pdf")
 	c.Header("Content-Type", "application/pdf")
 
 	// Read the pdf file and write it to the response
-	pdfData, err := os.ReadFile("yoursstore_invoice.pdf")
+	pdfData, err := os.ReadFile("primemart_invoice.pdf")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read pdf file"})
 		return
