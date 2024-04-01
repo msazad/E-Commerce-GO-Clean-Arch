@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"github.com/Anandhu4456/go-Ecommerce/cmd/api/docs"
-	di "github.com/Anandhu4456/go-Ecommerce/pkg/di"
+	"github.com/msazad/go-Ecommerce/cmd/api/docs"
+	di "github.com/msazad/go-Ecommerce/pkg/di"
 
-	"github.com/Anandhu4456/go-Ecommerce/pkg/config"
+	"github.com/msazad/go-Ecommerce/pkg/config"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 		log.Fatal("cannot load config", configErr)
 	}
 
-	docs.SwaggerInfo.Title = "YoursStore"
+	docs.SwaggerInfo.Title = "PrimeMart"
 	docs.SwaggerInfo.Description = "An Ecommerce Application"
 	docs.SwaggerInfo.Version = "1.0"
 	// docs.SwaggerInfo.Host = config.BASE_URL
